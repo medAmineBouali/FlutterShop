@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/product.dart';
 import 'package:provider/provider.dart';
 import '../providers/wishlist_provider.dart';
+import '../providers/cart_provider.dart';
 
 class DetailScreen extends StatelessWidget {
   final Product product;
@@ -138,8 +139,22 @@ class DetailScreen extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
+                  Provider.of<CartProvider>(context, listen: false).addItem(product);
+
+                  // 2️⃣ Show the feedback message
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hides old messages instantly
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("${product.title} added to cart!")),
+                    SnackBar(
+                      content: Text("${product.title} added to cart!"),
+                      duration: const Duration(seconds: 2),
+                      action: SnackBarAction(
+                        label: 'UNDO',
+                        onPressed: () {
+                          // Optional: If you want to let them undo immediately
+                          Provider.of<CartProvider>(context, listen: false).removeSingleItem(product.id);
+                        },
+                      ),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
