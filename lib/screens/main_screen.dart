@@ -17,7 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   // 📋 The List of pages we can switch between
   final List<Widget> _pages = [
     const HomeScreen(),
-    const ExploreScreen(), // Now linked correctly!
+    const ExploreScreen(),
     const WishlistScreen(),
     const CartScreen(),
   ];

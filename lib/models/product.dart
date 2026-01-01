@@ -15,16 +15,15 @@ class Product {
     required this.imageUrl,
   });
 
-  // Factory constructor to parse JSON data
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
       title: json['title'],
-      // API might return int (10) or double (10.5), so we handle both
+      // ⚠️ API prices can be Integers (10) or Doubles (10.99), so we handle both:
       price: (json['price'] as num).toDouble(),
       description: json['description'],
       category: json['category'],
-      imageUrl: json['image'], // Note: API calls it 'image'
+      imageUrl: json['image'], // FakeStoreAPI uses "image", not "imageUrl"
     );
   }
 }

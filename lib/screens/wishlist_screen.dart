@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/wishlist_provider.dart';
 import '../models/product.dart';
-import 'detail_screen.dart'; // To navigate when clicking an item
+import 'details_screen.dart'; // To navigate when clicking an item
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
