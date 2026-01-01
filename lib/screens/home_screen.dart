@@ -21,9 +21,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    super.initState();
+    // super.initState();
     // Start fetching data as soon as the app opens
     _productsFuture = fetchProducts();
+    
+    // Listen to changes in the search text field to filter results locally
+    _searchController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   // 🌐 API CALL FUNCTION
@@ -50,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Header & Search (Same as before) ---
+              // --- Header & Search ---
               _buildHeader(),
 
               // --- 🔄 FUTURE BUILDER (The API Logic) ---
@@ -68,11 +79,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   // 3. Success State
                   else if (snapshot.hasData) {
                     final allProducts = snapshot.data!;
+                    
+                    // --- SEARCH FILTER LOGIC ---
+                    final searchQuery = _searchController.text.toLowerCase();
+                    final filteredProducts = allProducts.where((product) {
+                      return product.title.toLowerCase().contains(searchQuery);
+                    }).toList();
+
+                    if (filteredProducts.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Center(child: Text("No matching products found.")),
+                      );
+                    }
 
                     // Group products by category
                     // This creates a Map like: {"electronics": [p1, p2], "jewelery": [p3]}
                     Map<String, List<Product>> categories = {};
-                    for (var product in allProducts) {
+                    for (var product in filteredProducts) {
                       if (!categories.containsKey(product.category)) {
                         categories[product.category] = [];
                       }
@@ -115,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-              const Text("FlutterShop", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text("Good deals", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: 20),
