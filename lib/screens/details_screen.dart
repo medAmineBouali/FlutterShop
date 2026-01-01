@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import 'package:provider/provider.dart';
-import '../providers/wishlist_provider.dart';
 import '../providers/cart_provider.dart';
+import '../providers/wishlist_provider.dart';
 
 class DetailScreen extends StatelessWidget {
   final Product product;
@@ -13,7 +13,6 @@ class DetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // 1. App Bar with "Heart" icon
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -21,25 +20,17 @@ class DetailScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-          actions: [
-            // WRAP the button in a Consumer to listen to changes
-            Consumer<WishlistProvider>(
+        actions: [
+           Consumer<WishlistProvider>(
               builder: (context, provider, child) {
-                // 1. Check if this specific product is already in the list
                 bool isFav = provider.isFavorite(product);
-
                 return IconButton(
                   icon: Icon(
-                    // 2. If favorite, show filled Heart. If not, show Border.
                     isFav ? Icons.favorite : Icons.favorite_border,
-                    // 3. If favorite, make it Red. If not, Black.
                     color: isFav ? Colors.red : Colors.black,
                   ),
                   onPressed: () {
-                    // 4. Call the toggle function we wrote in the Provider
                     provider.toggleFavorite(product);
-
-                    // 5. Show a feedback message
                     ScaffoldMessenger.of(context).clearSnackBars();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -51,129 +42,170 @@ class DetailScreen extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(width: 8),
-          ],
+            const SizedBox(width: 10),
+        ],
       ),
-
-      // 2. Body: Image + Text
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🖼️ Hero Image (The "Flying" Animation)
-                  Hero(
-                    tag: product.id, // Must match the tag in the previous screen
-                    child: Container(
-                      width: double.infinity,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        image: DecorationImage(
-                          image: NetworkImage(product.imageUrl),
-                          fit: BoxFit.contain, // Keeps the image aspect ratio
+                  // 1. Image
+                  Center(
+                    child: Hero(
+                      tag: product.id,
+                      child: Container(
+                        height: 300,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(product.imageUrl),
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+
+                  // 2. Title and Price
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          product.title,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "${product.price} €",
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // 3. Action Bar (Rounded container)
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8F9FA),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildActionButton(icon: Icons.store, label: "Store", isDark: true),
+                        _buildActionButton(icon: Icons.remove_shopping_cart, label: "Remove"),
+                        _buildActionButton(icon: Icons.remove_red_eye_outlined, label: "Catalog"),
+                        _buildActionButton(icon: Icons.share_outlined, label: "Share"),
+                      ],
                     ),
                   ),
 
                   const SizedBox(height: 24),
 
-                  // 📝 Details Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Title
-                        Text(
-                          product.title,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF111618), // From your HTML
-                            height: 1.2,
-                          ),
+                  // 4. Description
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Description",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      GestureDetector(
+                        onTap: () {},
+                        child: Row(
+                          children: const [
+                            Text("Show more", style: TextStyle(color: Colors.grey)),
+                            Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.grey)
+                          ],
                         ),
-                        const SizedBox(height: 8),
-
-                        // Price
-                        Text(
-                          "\$${product.price.toStringAsFixed(2)}",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF617F89), // Secondary color
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Description
-                        Text(
-                          product.description,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            height: 1.5,
-                            color: Color(0xFF111618),
-                          ),
-                        ),
-                      ],
-                    ),
+                      )
+                    ],
                   ),
+                  const SizedBox(height: 12),
+                  Text(
+                    product.description,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Colors.grey[600], height: 1.5, fontSize: 14),
+                  ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
           ),
 
-          // 3. "Add to Cart" Sticky Button
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Color(0xFFF0F3F4))),
-            ),
+          // 5. "Add to Cart" Button (Dark Orange)
+          Padding(
+            padding: const EdgeInsets.all(20.0),
             child: SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 56,
               child: ElevatedButton(
                 onPressed: () {
-                  Provider.of<CartProvider>(context, listen: false).addItem(product);
-
-                  // 2️⃣ Show the feedback message
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hides old messages instantly
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("${product.title} added to cart!"),
-                      duration: const Duration(seconds: 2),
-                      action: SnackBarAction(
-                        label: 'UNDO',
-                        onPressed: () {
-                          // Optional: If you want to let them undo immediately
-                          Provider.of<CartProvider>(context, listen: false).removeSingleItem(product.id);
-                        },
-                      ),
-                    ),
-                  );
+                   Provider.of<CartProvider>(context, listen: false).addItem(product);
+                   ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("${product.title} added to cart!"), duration: const Duration(seconds: 1)),
+                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF13B6EC), // 🎨 Your Cyan Color
-                  foregroundColor: const Color(0xFF111618), // Text Color
+                  backgroundColor: Colors.deepOrange, // Dark Orange
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: const Text(
                   "Add to Cart",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildActionButton({required IconData icon, required String label, bool isDark = false}) {
+    return Column(
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.black : Colors.transparent,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Icon(
+            icon,
+            color: isDark ? Colors.white : Colors.black,
+            size: 24,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+      ],
     );
   }
 }
