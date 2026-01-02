@@ -146,7 +146,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.black : const Color(0xFFF0F3F4),
+            color: isSelected ? Colors.deepOrange : const Color(0xFFF0F3F4), // Changed black to deepOrange
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
