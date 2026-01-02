@@ -3,6 +3,7 @@ import '../models/product.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/wishlist_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DetailScreen extends StatelessWidget {
   final Product product;
@@ -111,9 +112,24 @@ class DetailScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildActionButton(icon: Icons.store, label: "Store", isDark: true),
-                        _buildActionButton(icon: Icons.remove_shopping_cart, label: "Remove"),
+                        _buildActionButton(
+                          icon: Icons.remove_shopping_cart, 
+                          label: "Remove",
+                          onTap: () {
+                             Provider.of<CartProvider>(context, listen: false).removeSingleItem(product.id);
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               SnackBar(content: Text("${product.title} removed from cart!"), duration: const Duration(seconds: 1)),
+                             );
+                          }
+                        ),
                         _buildActionButton(icon: Icons.remove_red_eye_outlined, label: "Catalog"),
-                        _buildActionButton(icon: Icons.share_outlined, label: "Share"),
+                        _buildActionButton(
+                          icon: Icons.share_outlined, 
+                          label: "Share",
+                          onTap: () {
+                            Share.share('Check out this product: ${product.title} - ${product.price}€\n${product.imageUrl}');
+                          }
+                        ),
                       ],
                     ),
                   ),
@@ -184,28 +200,31 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton({required IconData icon, required String label, bool isDark = false}) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: isDark ? Colors.black : Colors.transparent,
-            borderRadius: BorderRadius.circular(15),
+  Widget _buildActionButton({required IconData icon, required String label, bool isDark = false, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black : Colors.transparent,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Icon(
+              icon,
+              color: isDark ? Colors.white : Colors.black,
+              size: 24,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: isDark ? Colors.white : Colors.black,
-            size: 24,
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

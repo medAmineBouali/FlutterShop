@@ -135,7 +135,8 @@ class CartScreen extends StatelessWidget {
     final total = subtotal + tax;
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      // Added bottom padding (100) to account for the floating navigation bar
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFF0F3F4))),
